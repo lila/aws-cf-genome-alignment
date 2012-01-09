@@ -1,0 +1,32 @@
+#!/bin/bash
+log='/tmp/init.log'
+yum -y install chef-solo ruby ruby-devel rubygems gcc make wget libruby-extras rdoc git &>> $log
+gem install ohai chef --no-rdoc --no-ri --verbose &>> $log
+cd /tmp
+wget https://s3.amazonaws.com/com.amazon.karan/chef/my-cookbooks.tar
+cd /
+tar -xvf /tmp/my-cookbooks.tar
+mkdir -p /etc/chef
+cat << EOF > /etc/chef/solo.rb
+cookbook_path ["/var/chef/cookbooks", "/var/chef/site-cookbooks"]
+role_path "/var/chef/roles"
+json_attribs "/etc/chef/node.json"
+log_location "/var/chef/solo.log"
+verbose_logging true
+EOF
+cat << EOF > /etc/chef/node.json
+{
+  "nfs": {
+    "exports": {
+        "/home/ec2-user": {
+	    "nfs_options": "*(rw,sync,no_root_squash)"
+	}
+    }
+	
+  },
+  "run_list": [ 
+    "role[nfs-server]"
+  ]
+}
+EOF
+chef-solo &>> $log

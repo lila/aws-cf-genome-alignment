@@ -1,0 +1,13 @@
+AWS-CF-Genome-Alignment 
+-----------------------
+
+This project provides cloudformation scripts and all other needed software to run a whole genome alignment application.  This is meant as a template for a production pipeline.
+
+Whole Genome Alignment:  see http://genomewiki.ucsc.edu/index.php/Whole_genome_alignment_howto
+
+Files:
+  README 	- this file
+  Makefile	- driver for running this on AWS 
+  chef/ 	- the chef cookbooks for installation of software 
+  cloudinit/- the cloudinit script to bootstrap chef onto the installation
+  cloudformation - the cloudformation template file

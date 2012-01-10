@@ -27,55 +27,16 @@
         "SecurityGroups": [ { "Ref": "incoming" } ],
         "KeyName": { "Ref": "KeyName" },
         "ImageId": "ami-7341831a",
-		"UserData": { "Fn::Base64" : { "Fn::Join" : ["", [ 
-			"#!/bin/bash\n",
-			 	"cd /tmp; wget https://s3.amazonaws.com/",
-				{ "Ref": "User" },
-				".genome.alignment/chef/genome-alignment-cookbook.tar\n",
-				"cd /var; tar -xvf /tmp/genome-alignment-cookbook.tar\n",
-				"chef-solo\n" 
-			]] }
-		}
-	  },
- 	  "Metadata" : {
-			"AWS::CloudFormation::Init" : { 
-				"config" : {
-					"packages" : { 
-						"rubygems" : { 
-							"chef" : [ "0.10.2" ] 
-						},
-						"yum" : { 
-							"gcc-c++" : [], 
-							"ruby-devel" : [], 
-							"make" : [], 
-							"autoconf" : [], 
-							"automake" : [], 
-							"rubygems" : []
-						} 
-					},
-					"files" : { 
-						"/etc/chef/solo.rb" : {
-							"content" : { "Fn::Join" : ["", [ 
-								"log_level :info\n", 
-								"log_location \"/var/log/solo.log\"\n", 
-								"cookbook_path \"/var/chef/cookbook\"\n", 
-								"json_attribs \"/etc/chef/node.json\"\n" 
-							]] }, 
-							"mode" : "000644", 
-							"owner" : "root", 
-							"group" : "wheel"
-						}, 
-						"/etc/chef/node.json" : {
-							"content" : { "Fn::Join" : ["", [ 
-								"{ \"run_list\": [\"recipe[ec2-commandline-tools]\" ] }"
-							]] }, 
-							"mode" : "000644", 
-							"owner" : "root", 
-							"group" : "wheel"
-						}
+		"UserData": { "Fn::Base64" : { 
+					         "Fn::Join" : [ "", [ 
+					               "#include ", 
+					                "https://s3.amazonaws.com/",
+					 				{ "Ref": "User" },
+									".genome.alignment/chef/bootstrap.txt"
+					              ]
+					 			]
+					          }
 					}
-				}
-			}
 		}
     },
     "incoming": {

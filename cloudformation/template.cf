@@ -24,6 +24,10 @@
 	"SecretKey": {
 	  "Description": "AWS Secret key, used for cfn-init",
 	  "Type": "String"
+	},
+	"AccountNumber": {
+	  "Description": "AWS accountid, used for starcluster",
+	  "Type": "String"
 	}
   },
 
@@ -35,6 +39,10 @@
         "SecurityGroups": [ { "Ref": "incoming" } ],
         "KeyName": { "Ref": "KeyName" },
         "ImageId": "ami-7341831a",
+		"Volumes" : [ 
+		          { "VolumeId" : { "Ref" : "NewVolume" },
+		            "Device" : "/dev/sdk"
+		          }
 		"UserData": { "Fn::Base64" : { "Fn::Join" : ["", [ 
 			"#!/bin/bash\n",
 			 	"cd /tmp; wget https://s3.amazonaws.com/",
@@ -67,7 +75,8 @@
 							"make" : [], 
 							"autoconf" : [], 
 							"automake" : [], 
-							"rubygems" : []
+							"rubygems" : [],
+							"python-devel" : []
 						} 
 					},
 					"files" : { 
@@ -83,9 +92,15 @@
 							"group" : "wheel"
 						}, 
 						"/etc/chef/node.json" : {
-							"content" : { "Fn::Join" : ["", [ 
-								"{ \"run_list\": [\"recipe[ec2-commandline-tools]\" ] }"
-							]] }, 
+							"content" : { 
+								"starcluster" : {
+									"access_key_id" : {"Ref" : "AccessKey"}, 
+									"secret_access_key"	: {"Ref" : "SecretKey"}, 
+									"account_number"	: {"Ref" : "AccountNumber"} 
+								},
+								"ensembl"
+								"run_list": [ "recipe[starcluster]" ] 
+							},
 							"mode" : "000644", 
 							"owner" : "root", 
 							"group" : "wheel"
@@ -105,6 +120,17 @@
           "ToPort": "22",
           "CidrIp": "0.0.0.0/0"
         } ]
+      }
+    },
+    "NewVolume" : {
+      "Type" : "AWS::EC2::Volume",
+      "Properties" : {
+        "SnapshotId" : "snap-97a09af6",
+        "AvailabilityZone" : "us-east-1a",
+        "Tags" : [{
+          "Key" : "Dataset",
+          "Value" : "Ensembl"
+        }]
       }
     }
   },

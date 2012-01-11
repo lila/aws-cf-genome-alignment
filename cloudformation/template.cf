@@ -16,7 +16,15 @@
     "KeyName": {
       "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instances",
       "Type": "String"
-    }
+    },
+    "AccessKey": {
+	  "Description": "AWS Access key, used for cfn-init",
+	  "Type": "String"
+	},
+	"SecretKey": {
+	  "Description": "AWS Secret key, used for cfn-init",
+	  "Type": "String"
+	}
   },
 
   "Resources": {
@@ -33,6 +41,15 @@
 				{ "Ref": "User" },
 				".genome.alignment/chef/genome-alignment-cookbook.tar\n",
 				"cd /var; tar -xvf /tmp/genome-alignment-cookbook.tar\n",
+				"/opt/aws/bin/cfn-init -s ", 
+					{ "Ref" : "AWS::StackName" }, 
+					" -r head ", 
+					"  --access-key=", 
+					{ "Ref" : "AccessKey" }, 
+					"  --secret-key=", 
+					{ "Ref": "SecretKey" }, 
+					"  --region ", 
+					{ "Ref" : "AWS::Region" }, "\n",
 				"chef-solo\n" 
 			]] }
 		}

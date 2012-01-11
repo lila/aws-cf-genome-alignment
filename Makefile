@@ -34,7 +34,7 @@ clean: cleanbootstrap
 
 create: bootstrap ${CFTemplatedir}/${CFTemplate}
 	@ echo deploying server using ${CFTemplatedir}/${CFTemplate}
-	${CF} genome-alignment --template-file ${CFTemplatedir}/${CFTemplate} --parameters "KeyName=$(KEY)"
+	${CF} genome-alignment --template-file ${CFTemplatedir}/${CFTemplate} --parameters "KeyName="$(KEY)";AccessKey="$(AWS_ACCESS_KEY_ID)";SecretKey="$(AWS_SECRET_ACCESS_KEY)
 
 destroy: cleanbootstrap
 	@ echo deleting server stack genome-alignment

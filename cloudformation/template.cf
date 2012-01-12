@@ -42,7 +42,7 @@
 		"Volumes" : [ 
 		          { "VolumeId" : { "Ref" : "NewVolume" },
 		            "Device" : "/dev/sdk"
-		          }
+		          }],
 		"UserData": { "Fn::Base64" : { "Fn::Join" : ["", [ 
 			"#!/bin/bash\n",
 			 	"cd /tmp; wget https://s3.amazonaws.com/",
@@ -98,7 +98,7 @@
 									"secret_access_key"	: {"Ref" : "SecretKey"}, 
 									"account_number"	: {"Ref" : "AccountNumber"} 
 								},
-								"ensembl"
+								"ensembl" : [],
 								"run_list": [ "recipe[starcluster]" ] 
 							},
 							"mode" : "000644", 

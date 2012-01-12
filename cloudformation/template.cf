@@ -39,10 +39,6 @@
         "SecurityGroups": [ { "Ref": "incoming" } ],
         "KeyName": { "Ref": "KeyName" },
         "ImageId": "ami-7341831a",
-		"Volumes" : [ 
-		          { "VolumeId" : { "Ref" : "NewVolume" },
-		            "Device" : "/dev/sdk"
-		          }],
 		"UserData": { "Fn::Base64" : { "Fn::Join" : ["", [ 
 			"#!/bin/bash\n",
 			 	"cd /tmp; wget https://s3.amazonaws.com/",
@@ -59,6 +55,12 @@
 					"  --region ", 
 					{ "Ref" : "AWS::Region" }, "\n",
 				"chef-solo\n" 
+				,
+				"curl -X PUT -H 'Content-Type:' --data-binary '{\"Status\" : \"SUCCESS\",",
+                                                             "\"Reason\" : \"Head node is ready\",",
+                                                             "\"UniqueId\" : \"head\",",
+                                                             "\"Data\" : \"Done\"}' ",
+                    "\"", {"Ref" : "WaitForheadWaitHandle"}, "\"\n"
 			]] }
 		}
 	  },
@@ -126,14 +128,40 @@
       "Type" : "AWS::EC2::Volume",
       "Properties" : {
         "SnapshotId" : "snap-97a09af6",
-        "AvailabilityZone" : "us-east-1a",
+        "AvailabilityZone" : { "Fn::GetAtt" : [ "head", "AvailabilityZone" ] },
         "Tags" : [{
           "Key" : "Dataset",
           "Value" : "Ensembl"
         }]
+      },
+	  "DependsOn" : "WaitForhead"
+    },
+	
+	"NewVolumeAttach" : {
+      "Type" : "AWS::EC2::VolumeAttachment",
+      "Properties" : {
+        "InstanceId" : { "Ref" : "head" },
+        "VolumeId" : { "Ref" : "NewVolume" },
+        "Device" : "/dev/sdk"
+      }
+    },
+    
+  "WaitForheadWaitHandle" : {
+      "Type" : "AWS::CloudFormation::WaitConditionHandle",
+      "Properties" : {
+      }
+    },
+	
+  "WaitForhead" : {
+      "Type" : "AWS::CloudFormation::WaitCondition",
+      "DependsOn" : "head",
+      "Properties" : {
+        "Handle" : {"Ref" : "WaitForheadWaitHandle"},
+        "Timeout" : "1200"
       }
     }
-  },
+	},
+	
   "Outputs" : {
     "InstanceId" : {
       "Description" : "InstanceId of the newly created EC2 instance",

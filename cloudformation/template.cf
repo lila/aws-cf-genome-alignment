@@ -127,7 +127,7 @@
     "NewVolume" : {
       "Type" : "AWS::EC2::Volume",
       "Properties" : {
-        "SnapshotId" : "snap-97a09af6",
+        "SnapshotId" : "snap-8eb00de7",
         "AvailabilityZone" : { "Fn::GetAtt" : [ "head", "AvailabilityZone" ] },
         "Tags" : [{
           "Key" : "Dataset",
